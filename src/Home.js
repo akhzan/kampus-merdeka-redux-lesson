@@ -1,9 +1,10 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, Card, CardContent, Modal, Radio } from '@mui/material'
 import { PRODUCTS } from './config'
-import { selectProduct } from './reducers/product'
+import { fetchProducts, selectProduct } from './reducers/product'
 import { Box } from '@mui/system'
 import { useHistory } from 'react-router-dom'
+import { useEffect } from 'react'
 
 const style = {
   position: 'absolute',
@@ -22,9 +23,44 @@ const style = {
 function Home() {
   const history = useHistory()
   const product = useSelector((state) => state.product)
-  const { selectedProduct } = product
+  const { selectedProduct, products, loading, error } = product
   const dispatch = useDispatch()
-  console.log('selectedProduct: ', selectedProduct, !!selectedProduct)
+  useEffect(() => {
+    dispatch(fetchProducts())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  const renderPokemonData = () => (
+    <Card style={{ marginTop: '2rem' }}>
+      <CardContent>
+        <h3>About this project</h3>
+        <p>This is a description of Bamboo Monitor Riser</p>
+        {products.map((product) => (
+          <Card key={product.id} style={{ marginBottom: '1rem' }}>
+            <CardContent>
+              <img src={product.ThumbnailImage} alt='' style={{ width: '64px', height: 'auto' }} />
+              <h4>{product.name}</h4>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ color: 'gray' }}>#{product.number}</div>
+                <Button variant='contained' onClick={() => dispatch(selectProduct(product.id))}>
+                  Select Pokemon
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </CardContent>
+    </Card>
+  )
+  const renderContent = () => {
+    if (loading) return null
+    return error ? (
+      <Card style={{ color: 'red', textAlign: 'center', marginTop: '1rem' }}>
+        <p>{error}</p>
+      </Card>
+    ) : (
+      renderPokemonData()
+    )
+  }
   return (
     <div style={{ padding: '1rem' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -44,26 +80,8 @@ function Home() {
               <p>This is a description of Bamboo Monitor Riser</p>
             </CardContent>
           </Card>
-          <Card style={{ marginTop: '2rem' }}>
-            <CardContent>
-              <h3>About this project</h3>
-              <p>This is a description of Bamboo Monitor Riser</p>
-              {PRODUCTS.map((product) => (
-                <Card key={product.code} style={{ marginBottom: '1rem' }}>
-                  <CardContent>
-                    <h4>{product.name}</h4>
-                    <p>{product.description}</p>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>{product.stock} left</div>
-                      <Button variant='contained' onClick={() => dispatch(selectProduct(product.code))}>
-                        Select Product
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </CardContent>
-          </Card>
+          {loading && <div>Loading...</div>}
+          {renderContent()}
         </section>
         <Modal
           open={!!selectedProduct}
@@ -74,32 +92,33 @@ function Home() {
           <Box sx={style}>
             <h3>Back this project</h3>
             <p>Want to support us in bringing this awesome stand to the world?</p>
-            {PRODUCTS.map((product) => (
-              <Card key={product.code} style={{ marginBottom: '1rem' }}>
-                <CardContent>
-                  <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-                    <Radio
-                      checked={selectedProduct === product.code}
-                      onChange={() => dispatch(selectProduct(product.code))}
-                      value='a'
-                      name='radio-buttons'
-                      inputProps={{ 'aria-label': 'A' }}
-                    />
-                    <div>
-                      <h4>{product.name}</h4>
-                      <p>{product.description}</p>
+            {products.length &&
+              [products[0], products[1], products[2]].map((product) => (
+                <Card key={product.id} style={{ marginBottom: '1rem' }}>
+                  <CardContent>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+                      <Radio
+                        checked={selectedProduct === product.id}
+                        onChange={() => dispatch(selectProduct(product.id))}
+                        value='a'
+                        name='radio-buttons'
+                        inputProps={{ 'aria-label': 'A' }}
+                      />
+                      <div>
+                        <img src={product.ThumbnailImage} alt='' style={{ width: '64px', height: 'auto' }} />
+                        <h4>{product.name}</h4>
+                      </div>
                     </div>
-                  </div>
-                  {selectedProduct === product.code && (
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                      <Button variant='contained' onClick={() => history.push('/success')}>
-                        Continue
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                    {selectedProduct === product.id && (
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                        <Button variant='contained' onClick={() => history.push('/success')}>
+                          Continue
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
           </Box>
         </Modal>
       </div>
