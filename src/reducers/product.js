@@ -28,13 +28,11 @@ export const { selectProduct, getProductsStarted, getProductsSuccess, getProduct
 export default productSlice.reducer
 
 export const fetchProducts = () => async (dispatch, getState) => {
-  console.log(getState())
   dispatch(getProductsStarted())
   try {
     const response = await axios('http://localhost:8080/')
     const filteredResponse = response.data.data.filter((product) => product.id < 10)
     dispatch(getProductsSuccess(filteredResponse))
-    console.log(getState())
   } catch (err) {
     dispatch(getProductsFailed(err.response.data.message))
   }

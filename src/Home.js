@@ -5,6 +5,7 @@ import { fetchProducts, selectProduct } from './reducers/product'
 import { Box } from '@mui/system'
 import { useHistory } from 'react-router-dom'
 import { useEffect } from 'react'
+import { fetchPokemonById } from './reducers/pokemon'
 
 const style = {
   position: 'absolute',
@@ -23,12 +24,15 @@ const style = {
 function Home() {
   const history = useHistory()
   const product = useSelector((state) => state.product)
+  const pokemon = useSelector((state) => state.pokemon)
   const { selectedProduct, products, loading, error } = product
   const dispatch = useDispatch()
   useEffect(() => {
     dispatch(fetchProducts())
+    dispatch(fetchPokemonById(1))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  console.log(pokemon)
   const renderPokemonData = () => (
     <Card style={{ marginTop: '2rem' }}>
       <CardContent>
