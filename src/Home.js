@@ -1,6 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, Card, CardContent, Modal, Radio } from '@mui/material'
-import { PRODUCTS } from './config'
 import { fetchProducts, selectProduct } from './reducers/product'
 import { Box } from '@mui/system'
 import { useHistory } from 'react-router-dom'
