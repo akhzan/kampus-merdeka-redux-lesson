@@ -34,6 +34,6 @@ export const fetchProducts = () => async (dispatch, getState) => {
     const filteredResponse = response.data.data.filter((product) => product.id < 10)
     dispatch(getProductsSuccess(filteredResponse))
   } catch (err) {
-    dispatch(getProductsFailed(err.response.data.message))
+    dispatch(getProductsFailed(err.response?.data.message || 'Error when calling API.'))
   }
 }
